@@ -30,11 +30,7 @@ class QueueService {
     
     const score = await redisClient.zScore(QUEUE_KEY,userId);
 
-    if(score===null) {
-        
-        return false;
-    }
-    return true;
+    return score!==null;
   }
   
   async getQueuePlayers() {
@@ -53,6 +49,7 @@ class QueueService {
         elo : player.score
       };
     });
+    return players;
   }
 }
 export default new QueueService();
