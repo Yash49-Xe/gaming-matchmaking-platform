@@ -1,31 +1,52 @@
 import queueService from "./queue.service";
+import {v4 as uuidv4} from "uuid";
+import Match from "../models/match.mode";
+import { getIO } from "../config/socket";
+
 
 class MatchService{
     
-    async processQueue(){
-        const players = await queueService.getQueuePlayers();
+    
 
-        let i=0;
+    async createMatch({
+        player1,
+        player2
+    }){
 
-        while(i<players.length-1){
-            const current=players[i];
-            const next=players[i+1];
+        const io=getIO();
+        try{
+            // Generate UUID
+        const matchID=uuidv4();
+        // Randomly assign X and O
+        const isPlayer1X=Math.random()<0.5;
 
-            const difference=next.elo-current.elo;
+        let playerX;
+        let playerO;
 
-            if(difference<=threshold){
-                // match them and move by 2
-            }
-            else{
-                // move by one
-
-            }
+        if(isPlayer1X){
+            playerX=player1;
+            playerO=player2;
         }
+        else{
+            playerX=player2;
+            playerO=player1;
+        }
+        // Create Match document
+        const match=new Match({
+            matchID,
+            playerX,
+            playerO
+        });
+        // Save to MongoDB
+        await match.save;
+        // Create Socket.IO room
+        // Emit matchFound
 
-    }
-
-    createMatch(current,next){
         
+        
+        }catch(error){
+            throw error;
+        }
     }
 }
 export default new MatchService();
