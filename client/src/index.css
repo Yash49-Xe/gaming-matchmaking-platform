@@ -11,16 +11,22 @@
   --text-muted: hsl(210, 8%, 50%);
 
   /* Neon Accent Tones */
-  --accent-blue: hsl(217, 100%, 61%);      /* Electric Blue */
-  --accent-purple: hsl(272, 85%, 60%);    /* Neon Purple */
-  --accent-emerald: hsl(150, 84%, 53%);   /* Success green */
-  --accent-crimson: hsl(346, 84%, 55%);   /* Danger red */
-  --accent-gold: hsl(45, 95%, 52%);       /* Warning gold */
+  --accent-blue: #007DCC;      /* Electric Blue */
+  --accent-blue-rgb: 0, 125, 204;
+  
+  --accent-gold: #FFB900;       /* Warning gold */
+  --accent-gold-rgb: 255, 185, 0;
+  
+  --accent-pink: #D10056;      /* Bright Pink */
+  --accent-pink-rgb: 209, 0, 86;
+  
+  --accent-dark-pink: #B2054C;  /* Dark Pink */
+  --accent-dark-pink-rgb: 178, 5, 76;
 
   /* Glassmorphism settings */
   --glass-bg: rgba(17, 18, 30, 0.45);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-glow: rgba(139, 92, 246, 0.15);
+  --glass-border-glow: rgba(var(--accent-pink-rgb), 0.15);
   --glass-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   --glass-blur: blur(12px);
 
@@ -72,7 +78,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-purple);
+  background: var(--accent-pink);
 }
 
 /* Typography */
@@ -89,7 +95,7 @@ a {
 }
 
 a:hover {
-  color: var(--accent-purple);
+  color: var(--accent-pink);
 }
 
 /* Glassmorphism Styles */
@@ -104,8 +110,8 @@ a:hover {
 }
 
 .glass-panel-glow:hover {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 20px 0 rgba(139, 92, 246, 0.2);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 20px 0 rgba(var(--accent-pink-rgb), 0.2);
 }
 
 /* Inputs and Forms */
@@ -125,7 +131,7 @@ a:hover {
   outline: none;
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(var(--accent-blue-rgb), 0.2);
 }
 
 .glass-select {
@@ -173,30 +179,30 @@ a:hover {
 }
 
 .glass-btn-primary {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-dark-pink));
   border: none;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 15px rgba(var(--accent-pink-rgb), 0.25);
 }
 
 .glass-btn-primary:hover:not(:disabled) {
   filter: brightness(1.15);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 20px rgba(var(--accent-pink-rgb), 0.35);
 }
 
 .glass-btn-success {
-  background: linear-gradient(135deg, hsl(150, 80%, 40%), var(--accent-emerald));
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-gold));
   border: none;
 }
 
 .glass-btn-danger {
-  background: linear-gradient(135deg, hsl(346, 80%, 45%), var(--accent-crimson));
+  background: linear-gradient(135deg, var(--accent-dark-pink), var(--accent-pink));
   border: none;
 }
 
 /* Animations */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-  50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); }
+  0%, 100% { box-shadow: 0 0 15px rgba(var(--accent-blue-rgb), 0.2); }
+  50% { box-shadow: 0 0 25px rgba(var(--accent-pink-rgb), 0.4); }
 }
 
 @keyframes radarSweep {
@@ -242,11 +248,11 @@ a:hover {
   border: 1px solid var(--glass-border);
 }
 
-.badge-primary { color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.1); }
-.badge-secondary { color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.1); }
-.badge-success { color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
-.badge-danger { color: var(--accent-crimson); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); }
-.badge-warning { color: var(--accent-gold); border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.1); }
+.badge-primary { color: var(--accent-blue); border-color: rgba(var(--accent-blue-rgb), 0.3); background: rgba(var(--accent-blue-rgb), 0.1); }
+.badge-secondary { color: var(--accent-pink); border-color: rgba(var(--accent-pink-rgb), 0.3); background: rgba(var(--accent-pink-rgb), 0.1); }
+.badge-success { color: var(--accent-gold); border-color: rgba(var(--accent-gold-rgb), 0.3); background: rgba(var(--accent-gold-rgb), 0.1); }
+.badge-danger { color: var(--accent-dark-pink); border-color: rgba(var(--accent-dark-pink-rgb), 0.3); background: rgba(var(--accent-dark-pink-rgb), 0.1); }
+.badge-warning { color: var(--accent-gold); border-color: rgba(var(--accent-gold-rgb), 0.3); background: rgba(var(--accent-gold-rgb), 0.1); }
 
 /* Native Dialog Modals styling */
 dialog {
