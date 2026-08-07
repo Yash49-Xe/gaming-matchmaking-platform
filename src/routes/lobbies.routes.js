@@ -1,75 +1,95 @@
 import express from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { lobbies, lobbyJoinRequests, users } from '../utils/mockData.js';
+import Lobby from '../database/models/Lobby.model.js';
+import User from '../database/models/User.model.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    const publicLobbies = Array.from(lobbies.values()).filter(l => l.isPublic);
-    res.status(200).json({ lobbies: publicLobbies });
+router.get('/', async (req, res) => {
+    try {
+        const publicLobbies = await Lobby.find({ isPublic: true }).populate('leaderId members', 'username elo');
+        res.status(200).json({ lobbies: publicLobbies });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-router.post('/', (req, res) => {
-    const { name, game, leaderId, isPublic } = req.body;
-    
-    if (!users.has(leaderId)) {
-        return res.status(404).json({ error: 'Leader not found' });
-    }
-
-    const lobbyId = uuidv4();
-    const newLobby = {
-        id: lobbyId,
-        name,
-        game,
-        leaderId,
-        members: [leaderId],
-        status: 'waiting',
-        isPublic: isPublic !== false, // default true
-        readyStatus: { [leaderId]: false }
-    };
-
-    lobbies.set(lobbyId, newLobby);
-    res.status(201).json({ message: 'Lobby created', lobby: newLobby });
-});
-
-router.post('/:id/join-request', (req, res) => {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    if (!lobbies.has(id)) {
-        return res.status(404).json({ error: 'Lobby not found' });
-    }
-    
-    if (!lobbyJoinRequests.has(id)) {
-        lobbyJoinRequests.set(id, new Set());
-    }
-    lobbyJoinRequests.get(id).add(userId);
-    
-    res.status(200).json({ message: 'Join request sent to leader' });
-});
-
-router.post('/:id/join-respond', (req, res) => {
-    const { id } = req.params;
-    const { leaderId, userId, accept } = req.body;
-
-    const lobby = lobbies.get(id);
-    if (!lobby || lobby.leaderId !== leaderId) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    const requests = lobbyJoinRequests.get(id);
-    if (requests && requests.has(userId)) {
-        requests.delete(userId);
-        if (accept) {
-            lobby.members.push(userId);
-            lobby.readyStatus[userId] = false;
-            return res.status(200).json({ message: 'Request accepted', lobby });
-        } else {
-            return res.status(200).json({ message: 'Request rejected' });
+router.post('/', async (req, res) => {
+    try {
+        const { name, game, leaderId, isPublic } = req.body;
+        
+        const leader = await User.findById(leaderId);
+        if (!leader) {
+            return res.status(404).json({ error: 'Leader not found' });
         }
+
+        const newLobby = new Lobby({
+            name,
+            game,
+            leaderId,
+            members: [leaderId],
+            status: 'waiting',
+            isPublic: isPublic !== false, // default true
+            readyStatus: { [leaderId]: false }
+        });
+
+        await newLobby.save();
+        res.status(201).json({ message: 'Lobby created', lobby: newLobby });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-    
-    res.status(404).json({ error: 'Request not found' });
+});
+
+router.post('/:id/join-request', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { userId } = req.body;
+
+        const lobby = await Lobby.findById(id);
+        if (!lobby) {
+            return res.status(404).json({ error: 'Lobby not found' });
+        }
+        
+        if (!lobby.joinRequests.includes(userId)) {
+            lobby.joinRequests.push(userId);
+            await lobby.save();
+        }
+        
+        res.status(200).json({ message: 'Join request sent to leader' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/:id/join-respond', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { leaderId, userId, accept } = req.body;
+
+        const lobby = await Lobby.findById(id);
+        if (!lobby || lobby.leaderId.toString() !== leaderId) {
+            return res.status(403).json({ error: 'Not authorized' });
+        }
+
+        if (lobby.joinRequests.includes(userId)) {
+            lobby.joinRequests = lobby.joinRequests.filter(reqId => reqId.toString() !== userId);
+            
+            if (accept) {
+                if (!lobby.members.includes(userId)) {
+                    lobby.members.push(userId);
+                }
+                lobby.readyStatus.set(userId, false);
+                await lobby.save();
+                return res.status(200).json({ message: 'Request accepted', lobby });
+            } else {
+                await lobby.save();
+                return res.status(200).json({ message: 'Request rejected' });
+            }
+        }
+        
+        res.status(404).json({ error: 'Request not found' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 export default router;

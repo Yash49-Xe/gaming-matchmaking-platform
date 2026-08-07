@@ -1,15 +1,24 @@
 {
   "name": "game-match-making",
   "version": "1.0.0",
-  "description": "",
-  "main": "queue.service.js",
+  "description": "Gaming Matchmaking Platform Backend",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "redis": "^4.7.1"
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "mongodb-memory-server": "^11.2.0",
+    "mongoose": "^9.9.1",
+    "redis": "^4.7.1",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1"
   }
 }

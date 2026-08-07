@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { connectDB } from './database/connection.js';
 import { initializeSocket } from './config/socket.js';
 import { setupLobbySockets } from './sockets/lobby.handlers.js';
 import { setupMatchSockets } from './sockets/match.handlers.js';
@@ -39,7 +41,6 @@ initializeSocket(io);
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
     
-    // Setup socket event handlers
     setupLobbySockets(socket, io);
     setupMatchSockets(socket, io);
 
@@ -49,6 +50,11 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+// Connect to DB then start server
+connectDB().then(() => {
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 });
+
