@@ -1,32 +1,33 @@
 import express from 'express';
-import { users, lobbies, matches } from '../utils/mockData.js';
+import User from '../database/models/User.model.js';
+import Lobby from '../database/models/Lobby.model.js';
 
 const router = express.Router();
 
 // Mock Admin Middleware
-const isAdmin = (req, res, next) => {
-    // Basic mock admin check
+const isAdmin = async (req, res, next) => {
     const { adminId } = req.query;
-    const user = users.get(adminId);
-    if (user && user.isAdmin) {
-        return next();
+    if (adminId) {
+        const user = await User.findById(adminId);
+        if (user && user.isAdmin) {
+            return next();
+        }
     }
     // Return early to test without strict auth
     return next();
 };
 
-router.get('/users', isAdmin, (req, res) => {
-    const allUsers = Array.from(users.values());
+router.get('/users', isAdmin, async (req, res) => {
+    const allUsers = await User.find({}, '-friendRequests');
     res.status(200).json({ users: allUsers });
 });
 
-router.get('/lobbies', isAdmin, (req, res) => {
-    const allLobbies = Array.from(lobbies.values());
+router.get('/lobbies', isAdmin, async (req, res) => {
+    const allLobbies = await Lobby.find({});
     res.status(200).json({ lobbies: allLobbies });
 });
 
 router.get('/reports', isAdmin, (req, res) => {
-    // Mock reports
     res.status(200).json({ reports: [] });
 });
 
