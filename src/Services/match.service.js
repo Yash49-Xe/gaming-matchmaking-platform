@@ -1,11 +1,11 @@
-import queueService from "./queue.service";
+import queueService from "./queue.service.js";
 import {v4 as uuidv4} from "uuid";
-import Match from "../models/match.mode";
-import { getIO } from "../config/socket";
+// import Match from "../models/match.mode";
+import { getIO } from "../config/socket.js";
+import { matches } from "../utils/mockData.js";
 
 
 class MatchService{
-    
     
 
     async createMatch({
@@ -31,16 +31,17 @@ class MatchService{
             playerX=player2;
             playerO=player1;
         }
-        // Create Match document
-        const match=new Match({
-            matchID,
+        // Create Match mock
+        const match= {
+            id: matchID,
             playerX,
-            playerO
-        });
-        // Save to MongoDB
-        await match.save;
-        // Create Socket.IO room
-        // Emit matchFound
+            playerO,
+            status: 'active'
+        };
+        // Save to mock memory
+        matches.set(matchID, match);
+        // Emit matchFound (placeholder logic, would emit to room)
+        io.emit('matchFound', { matchID });
 
         
         
